@@ -10,8 +10,9 @@ init(autoreset=True)
 
 os.environ['logfile'] = "none"
 
+resetstyle = Style.RESET_ALL
+
 stylelist = [
-    Style.DIM,
     Style.BRIGHT,
     Style.NORMAL,
     '\033[1m',
@@ -25,13 +26,15 @@ colorlist = [
     Fore.GREEN,
     Fore.YELLOW,
     Fore.RED,
-    Fore.LIGHTBLACK_EX,
     Fore.LIGHTCYAN_EX,
     Fore.LIGHTGREEN_EX,
     Fore.LIGHTMAGENTA_EX,
     Fore.MAGENTA,
     Fore.WHITE
 ]
+
+def getrandomLogo():
+    return open(f"LOGOS/{str(randint(1,len(os.listdir('LOGOS'))))}.txt", "r").read()
 
 def getRandomColor():
     return colorlist[randint(0,len(colorlist)-1)]
@@ -55,7 +58,7 @@ def createlogs():
 
 def executeallmodules():
     cmds = json.loads(str(open("CONFIG/commands.json", "r").read()))
-    dontexecute = ["all", "dellogs", "bye", "cls", "target"]
+    dontexecute = ["all", "dellogs", "bye", "cls", "target", "targetlocation"]
     for command in cmds:
         c = cmds[command][1]
         if command not in dontexecute:
@@ -72,6 +75,17 @@ def betterprint(text):
 def set_target():
     if isnotargetselected():
         gettarget()
+
+def gettargetlocation():
+    return open("CONFIG/targetlocation.txt", "r").read()
+
+def set_targetlocation():
+    betterprint("Current target's location: "+gettargetlocation())
+    loc = input("Insert new target location ('no' to skip): ")
+    if loc == "no":
+        loc = "no_city_specified"
+    open("CONFIG/targetlocation.txt", "w").write(loc)
+    betterprint("New target's location: "+gettargetlocation())
 
 def currenttarget():
     return open("CONFIG/target.txt", "r").readline()

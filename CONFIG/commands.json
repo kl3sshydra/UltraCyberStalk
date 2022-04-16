@@ -15,6 +15,10 @@
         "sets the target to run modules on",
         "utils.gettarget()"
     ],
+    "targetlocation": [
+        "sets the target('s location) to run modules on",
+        "utils.set_targetlocation()"
+    ],
     "usernamesearch": [
         "search an username in some popular social medias",
         "usernamesearch = modules.usernamesearch();usernamesearch.main()"

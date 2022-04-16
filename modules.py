@@ -25,8 +25,12 @@ class dork:
         url_list = []
         utils.set_target()
         target = open("CONFIG/target.txt", "r").readline()
+        depth = 30
         if mode == "normal":
-            depth = int(input("Max urls per request: "))
+            try:
+                depth = int(input("Max urls per request: "))
+            except:
+                pass
         else:
             try:
                 depth = int(open("CONFIG/dorksdepth.txt", "r").readline())
@@ -97,17 +101,60 @@ class peoplesearch:
             found = f"No pepole found for '{name}' in the US using radaris"
         utils.betterprint(f"---\n{name} -> \n{found}\n---")
 
+    def paginebianche(nome, citta):
+        if citta == "no_city_specified":
+            citta = "italia"
+        url = f'https://www.paginebianche.it/ricerca?qs={nome.replace(" ", "%20")}&dv={citta}'
+        r = requests.get(url)
+        linksfound = r.text.split('<a href="')
+        if len(linksfound) == 16:
+            return 0
+        count = 0
+        validlinks = 0
+        for l in linksfound:
+            if l.startswith("https://www.paginebianche.it/") and '"><svg' not in l and "localita.html" not in l and "ricerca?qs" not in l:
+                utils.betterprint("PagineBianche -> "+l.split('" title="')[0])
+                validlinks+=1 
+            count+=1
+        return validlinks
+
+    def paginegialle(nome, citta):
+        if citta == "no_city_specified":
+            citta = "italia"
+        url = f'https://www.paginegialle.it/ricerca/{nome.replace(" ", "%20")}/{citta}'
+        r = requests.get(url)
+        linksfound = r.text.split("href=\"")
+        foundlist = []
+        if len(linksfound) == 306:
+            return 0
+        for l in linksfound:
+            l = l.split("\">")[0]
+            if l.startswith("https://www.paginegialle.it/") and 'rel="nofollow' not in l and "/ricerca/" not in l and nome.split(" ")[0] in l:
+                try:
+                    l = l.split('" title="')[0].split("\n")[0]
+                    if l not in foundlist and "/commenti" not in l and "-timetable" not in l:
+                        utils.betterprint("PagineGialle -> "+l)
+                        foundlist.append(l)
+                except:
+                    pass
+
     def peopledorks():
         dorklist = ["paginebianche {target}", "paginegialle {target}"]
         for d in dorklist:
             for j in search(d, tld="co.in", num=15, stop=15):
-                if dork.shouldprinturl(j):
+                if dork.shouldprinturl(j) and ("pagine" in j and ("gialle" in j or "bianche" in j)):
                     utils.betterprint(f"---\nPeopleSearch dorks -> \n{j}\n---")
                     url_list.append(j)
 
     def main(self):
-        target = open("CONFIG/target.txt", "r").readline()
+        target = utils.currenttarget()
         query = f"https://radaris.com/p/{target.replace(' ', '/')}/"
         utils.betterprint(f"Starting peoplesearch against '{target}'")
         peoplesearch.radaris(query)
         peoplesearch.peopledorks()
+        pbianche = peoplesearch.paginebianche(target, utils.gettargetlocation())
+        if pbianche == 0:
+            utils.betterprint("No people found with paginebianche module.")
+        pgialle = peoplesearch.paginegialle(target, utils.gettargetlocation())
+        if pgialle == 0:
+            utils.betterprint("No companies found with paginegialle module")

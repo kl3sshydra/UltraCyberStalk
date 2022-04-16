@@ -24,19 +24,10 @@ class mainclass:
 
     def shell(self):
         while True:
-            mainclass.processcommand(input("? "))
+            mainclass.processcommand(input(f"{utils.stylelist[2]}{utils.getRandomColor()}? "))
 
     def logo(self):
-        print(f"""
-       ____                                   
- __ __/ / /________ _                         
-/ // / / __/ __/ _ `/                         
-\_,_/_/\__/_/  \_,_/        __       ____     
- ______ __/ /  ___ _______ / /____ _/ / /__   
-/ __/ // / _ \/ -_) __(_-</ __/ _ `/ /  '_/   
-\__/\_, /_.__/\__/_/ /___/\__/\_,_/_/_/\_\    
-   /___/                                       
-        
+        print(f"""{utils.getrandomLogo()}
 [{mainclass.version} by github.com/kl3sshydra]
 
         """)
